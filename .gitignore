@@ -6,3 +6,5 @@ sandbox/sales_train_complete.csv
 competitive-data-science-predict-future-sales
 poetry.lock
 pyproject.toml
+sandbox/DS_0_Task
+sandbox/scripts/__pycache__

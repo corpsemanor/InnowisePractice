@@ -1,17 +1,15 @@
 import pandas as pd
 from rapidfuzz import process, fuzz
 
-cities_list = ['Москве', 'Санкт-Петербурге', 'Казани', 'Новосибирске']
-
-
 def get_shop_working_days_sorted(sales_data, shops_data):
     """
-    Возвращает отсортированный словарь с названиями магазинов и количеством дней, 
-    в которые каждый магазин был активен (уникальные даты), отсортированный по возрастанию.
-    
-    :param sales_data: pandas.DataFrame, данные о продажах (sales_train)
-    :param shops_data: pandas.DataFrame, данные о магазинах (shops)
-    :return: dict, отсортированный словарь {название магазина: количество уникальных дней}
+    Returns a sorted dictionary with shop names and the number of days each shop was active (unique dates),
+    sorted in ascending order by the count.
+
+    Copy
+    :param sales_data: pandas.DataFrame, sales data (sales_train)
+    :param shops_data: pandas.DataFrame, shop data (shops)
+    :return: dict, sorted dictionary {shop name: number of unique days}
     """
     sales_data['date'] = pd.to_datetime(sales_data['date'], dayfirst=True)
     grouped = sales_data.groupby('shop_id')['date'].nunique()

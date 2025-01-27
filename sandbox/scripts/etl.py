@@ -9,13 +9,12 @@ def filter_outliers(df, column, lower_percentile, upper_percentile):
 
     :param df: DataFrame to filter
     :param column: Column name to filter
-    :param lower_percentile: Lower percentile threshold
-    :param upper_percentile: Upper percentile threshold
+    :param lower_percentile: Lower percentile threshold (0-100)
+    :param upper_percentile: Upper percentile threshold (0-100)
     :return: Filtered DataFrame
     """
-    percs = df[column].describe(percentiles=[lower_percentile / 100, upper_percentile / 100])
-    lower_bound = percs[f'{lower_percentile}%']
-    upper_bound = percs[f'{upper_percentile}%']
+    lower_bound = df[column].quantile(lower_percentile / 100)
+    upper_bound = df[column].quantile(upper_percentile / 100)
     return df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
 
 
