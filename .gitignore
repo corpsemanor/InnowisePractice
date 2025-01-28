@@ -8,3 +8,4 @@ poetry.lock
 pyproject.toml
 sandbox/DS_0_Task
 sandbox/scripts/__pycache__
+sandbox/predictions.csv
