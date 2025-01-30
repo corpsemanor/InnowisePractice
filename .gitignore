@@ -9,3 +9,7 @@ pyproject.toml
 sandbox/DS_0_Task
 sandbox/scripts/__pycache__
 sandbox/predictions.csv
+sandbox/baseline_modeling_1.ipynb
+sandbox/sales_train_compltete_1.csv
+sandbox/scripts/VAlshit.py
+sandbox/modeling.ipynb
