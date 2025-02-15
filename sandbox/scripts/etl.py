@@ -70,27 +70,45 @@ def merge_sales_data(sales_df, items_df, categories_df, shops_df):
     return sales_train_complete
 
 
-def clean_shops_data(shops_df, sales_df):
+def clean_shops_data(shops_df, sales_df, test_df):
     """
-    Clean the shops DataFrame by handling potential duplicates.
+    Clean the shops DataFrame by handling potential duplicates and filtering sales_df 
+    to include only shops present in test_df, ensuring that among duplicates, 
+    the one present in test_df is kept.
 
     :param shops_df: Shops DataFrame
     :param sales_df: Sales DataFrame (to merge shop duplicates)
-    :return: Cleaned shops DataFrame and updated sales DataFrame
+    :param test_df: Test DataFrame containing relevant shop IDs
+    :return: Cleaned shops DataFrame and filtered sales DataFrame
     """
     potential_duplicates = find_potential_duplicates(shops_df, 'shop_name')
-
+    valid_shop_ids = set(test_df['shop_id'].unique())
+    
     for pair in potential_duplicates:
         dup1, dup2 = pair[:2]
         shop1 = shops_df[shops_df['shop_name'] == dup1]
         shop2 = shops_df[shops_df['shop_name'] == dup2]
 
         if not shop1.empty and not shop2.empty:
-            main_shop_id = min(shop1['shop_id'].iloc[0], shop2['shop_id'].iloc[0])
-            duplicate_shop_id = max(shop1['shop_id'].iloc[0], shop2['shop_id'].iloc[0])
-
+            shop1_id = shop1['shop_id'].iloc[0]
+            shop2_id = shop2['shop_id'].iloc[0]
+            
+            if shop1_id in valid_shop_ids and shop2_id in valid_shop_ids:
+                # Оставляем оба, если оба есть в test_df
+                continue
+            elif shop1_id in valid_shop_ids:
+                main_shop_id, duplicate_shop_id = shop1_id, shop2_id
+            elif shop2_id in valid_shop_ids:
+                main_shop_id, duplicate_shop_id = shop2_id, shop1_id
+            else:
+                continue
+            
             sales_df.loc[sales_df['shop_id'] == duplicate_shop_id, 'shop_id'] = main_shop_id
             shops_df = shops_df[shops_df['shop_id'] != duplicate_shop_id]
+    
+    # Фильтрация sales_df, оставляя только магазины из test_df
+    sales_df = sales_df[sales_df['shop_id'].isin(valid_shop_ids)]
+    shops_df = shops_df[shops_df['shop_id'].isin(valid_shop_ids)]
 
     return shops_df, sales_df
 
@@ -108,7 +126,7 @@ def etl(data, lower_percentile=1, upper_percentile=99):
 
     sales_df = clean_sales_data(data['sales_train'].copy(), lower_percentile, upper_percentile)
 
-    shops_df, sales_df = clean_shops_data(data['shops'].copy(), sales_df)
+    shops_df, sales_df = clean_shops_data(data['shops'].copy(), sales_df, data['test']) 
 
     items_df = data['items']
     categories_df = data['item_categories']
